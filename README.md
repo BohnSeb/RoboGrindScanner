@@ -15,6 +15,7 @@ Tools to control a mobile platform MiR-100 and an UR5e for 3d scan ob big object
 - Aluminiumplatte befindet sich im Labor, bei der Fitness-Laufmaschine
 - Artec3d Sensor wird von Oliver im Labor deponiert. Er stellt den Karton unten an das mittlere Fenster.
 - UR-Arme gibt es zwei im Labor, welchen wir nehmen steht noch nicht fest.
+- UR Treiber: https://github.com/UniversalRobots/Universal_Robots_ROS_Driver (command: catkin_make in dem catkin_ws Ordner um den Treiber zu bauen)
 
 ## Empfehlungen
 - für UR-Simulation sollte RViz und MoveIt verwendet werden.
