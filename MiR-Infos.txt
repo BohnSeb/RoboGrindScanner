@@ -1,0 +1,12 @@
+WLAN: MIR_R84	PW: mirex4you
+
+MiR-IP: 192.168.12.20
+
+MiR-WebUi Username: distributor PW: distributor
+
+--- ROS ---
+Start ROS-Master: roscore
+Connect to external rosmaster: export ROS_MASTER_URI=http://MiR-IP:11311
+Run a ros module: rosrun module
+List ROSTopics: rostopic list
+Visualisierung: RViz (command: rviz rviz)
