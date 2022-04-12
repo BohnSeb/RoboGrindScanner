@@ -1,4 +1,4 @@
-#! /usr/bin/bash
+#! /bin/bash
 #cd catkin_ws/Universal_Robots_ROS_Driver;
 git submodule init & git submodule update;
 
