@@ -4,6 +4,7 @@ git submodule init & git submodule update;
 
 #make catkin workspace
 cd catkin_ws;
+catkin init;
 sudo apt update -qq;
 rosdep update;
 rosdep install --from-paths src --ignore-src -y;
