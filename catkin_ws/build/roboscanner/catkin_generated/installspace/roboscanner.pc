@@ -1,0 +1,8 @@
+prefix=E:/Projects/RoboGrindScanner/catkin_ws/install
+
+Name: roboscanner
+Description: Description of roboscanner
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
