@@ -34,12 +34,13 @@ add_executable(testscan src/artec.cpp)
 
 
 target_link_libraries(testscan
-   ${catkin_LIBRARIES} E:/Projects/RoboGrindScanner/catkin_ws/src/artec/lib/artec-sdk-algorithms.lib
- E:/Projects/RoboGrindScanner/catkin_ws/src/artec/lib/artec-sdk-base.lib
- E:/Projects/RoboGrindScanner/catkin_ws/src/artec/lib/artec-sdk-capturing.lib
- E:/Projects/RoboGrindScanner/catkin_ws/src/artec/lib/artec-sdk-project.lib
- E:/Projects/RoboGrindScanner/catkin_ws/src/artec/lib/artec-sdk-scanning.lib
- )
+  ${catkin_LIBRARIES} 
+  ${PROJECT_SOURCE_DIR}/lib/artec-sdk-algorithms.lib
+  ${PROJECT_SOURCE_DIR}/lib/artec-sdk-base.lib
+  ${PROJECT_SOURCE_DIR}/lib/artec-sdk-capturing.lib
+  ${PROJECT_SOURCE_DIR}/lib/artec-sdk-project.lib
+  ${PROJECT_SOURCE_DIR}/lib/artec-sdk-scanning.lib
+)
 add_custom_command(TARGET testscan POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PROJECT_SOURCE_DIR}/dll"
