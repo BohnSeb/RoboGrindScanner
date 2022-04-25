@@ -1,2 +1,0 @@
-artec
--DCMAKE_BUILD_TYPE=RelWithDebInfo -DCATKIN_DEVEL_PREFIX=E:\Projects\RoboGrindScanner\catkin_ws\devel -DCMAKE_INSTALL_PREFIX=E:\Projects\RoboGrindScanner\catkin_ws\install -G Ninja

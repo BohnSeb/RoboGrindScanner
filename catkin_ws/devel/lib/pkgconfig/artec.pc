@@ -1,8 +1,0 @@
-prefix=E:/Projects/RoboGrindScanner/catkin_ws/devel
-
-Name: artec
-Description: Description of artec
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
