@@ -1,6 +1,3 @@
-#include <ros/ros.h>
-#include <signal.h>
-#include <std_msgs/Int8.h>
 /********************************************************************
 *
 *   Project     Artec 3D Scanning SDK Samples
@@ -129,7 +126,8 @@ const int NumberOfFramesToCapture = 100;
 
 static bool s_Finished = false;
 
-int scan()
+
+int main(int argc, char** argv)
 {
 	TRef<asdk::IModel> inputContainer;
 	TRef<asdk::IModel> outputContainer;
@@ -149,42 +147,42 @@ int scan()
 	{
 		TRef<asdk::IArrayScannerId> scannersList;
 		// Look for the scanners attached
-		ROS_INFO("Enumerating scanners... ");
+		std::wcout << L"Enumerating scanners... ";
 		if (asdk::enumerateScanners(&scannersList) != asdk::ErrorCode_OK)
 		{
-			ROS_INFO("failed");
+			std::wcout << L"failed" << std::endl;
 			return 1;
 		}
-		ROS_INFO("done");
+		std::wcout << L"done" << std::endl;
 		// Check for any scanners found
 		if (scannersList->getSize() == 0)
 		{
-			ROS_INFO("No scanners are found");
+			std::wcout << L"No scanners are found" << std::endl;
 			return 2;
 		}
 		// Connect to the first available scanner
 		TArrayRef<asdk::IArrayScannerId> scannersArray(scannersList);
 		for (int i = 0; i < scannersArray.size(); i++)
 		{
-			
-			ROS_INFO("Connecting to the scanner... ");
+			std::wcout << L"Scanner " << scannersArray[i].serial << L" is found" << std::endl;
+			std::wcout << L"Connecting to the scanner... ";
 			if (asdk::createScanner(&scanner, &scannersArray[i]) != asdk::ErrorCode_OK)
 			{
-				ROS_INFO("failed");
+				std::wcout << L"failed" << std::endl;
 				continue;
 			}
-			ROS_INFO("done");
+			std::wcout << L"done" << std::endl;
 
 			break;
 		}
 		if (!scanner)
 		{
-			ROS_INFO("No scanner can be connected to");
+			std::wcout << L"No scanner can be connected to" << std::endl;
 			return 3;
 		}
 	}
 
-	ROS_INFO("Capturing  frames with ");
+	std::wcout << L"Capturing  frames with " << std::endl;
 
 	// Initialize a frame processor 
 	TRef<asdk::IFrameProcessor> processor;
@@ -201,37 +199,37 @@ int scan()
 	{
 		if (ec == asdk::ErrorCode_FrameCaptureTimeout)
 		{
-			ROS_INFO("Capture error: frame capture timeout");
+			std::wcout << L"Capture error: frame capture timeout" << std::endl;
 		}
 		else if (ec == asdk::ErrorCode_FrameCorrupted)
 		{
-			ROS_INFO("Capture error: frame corrupted");
+			std::wcout << L"Capture error: frame corrupted" << std::endl;
 		}
 		else if (ec == asdk::ErrorCode_FrameReconstructionFailed)
 		{
-			ROS_INFO("Capture error: frame reconstruction failed");
+			std::wcout << L"Capture error: frame reconstruction failed" << std::endl;
 		}
 		else if (ec == asdk::ErrorCode_FrameRegistrationFailed)
 		{
-			ROS_INFO("Capture error: frame registration failed");
+			std::wcout << L"Capture error: frame registration failed" << std::endl;
 		}
 		else
 		{
-			ROS_INFO("Capture error: unknown error");
+			std::wcout << L"Capture error: unknown error" << std::endl;
 		}
-		//return -1;
+		return -1;
 	}
 	int frameNumber = frame->getFrameNumber();
 
 	// Reconstruct 3D mesh for the captured frame
 	TRef<asdk::IFrameMesh> mesh;
-	ROS_INFO("PLS SEND HELP! IM UNDER THE WATER!");
+
 	if (processor->reconstructAndTexturizeMesh(&mesh, frame) != asdk::ErrorCode_OK)
 	{
-		
+		std::wcout << L"Capture error: reconstruction failed for frame " << std::setw(4) << (frameNumber + 1) << std::endl;
 		return -1;
 	}
-	ROS_INFO("PLS SEND HELP! IM UNDER THE WATER!");
+	/*
 	float averageDistance = 0;
 	float closestPoint = 0;
 	float furthestPoint = 0;
@@ -259,24 +257,20 @@ int scan()
 	{
 		averageDistance = averageDistance / points.size();
 	}
-	
-	ROS_INFO("Measured average distance: ");
-	ROS_INFO("%f",averageDistance);
-	ROS_INFO("Measured closest distance: ");
-	ROS_INFO("%f", closestPoint);
-	ROS_INFO("Measured furthest distance: ");
-	ROS_INFO("%f",furthestPoint);
-	
-	/*
-	for (int i = 0; i < points.size() - 1; i++) {
+	std::wcout << L"Measured average distance: " << averageDistance << std::endl;
+	std::wcout << L"Measured closest distance: " << closestPoint << std::endl;
+	std::wcout << L"Measured furthest distance: " << furthestPoint << std::endl;
+	*/
+	asdk::TArrayPoint3F points = mesh->getPoints();
+	/*for (int i = 0; i < points.size() - 1; i++) {
 		asdk::Point3F point = points[i];
-		ROS_INFO("Point" + std::to_string(i) + ": X="  +std::to_string(point.x) + " Y=" + std::to_string(point.y) + " Z=" + std::to_string(point.z));
+		std::wcout << L"Point" << i << ": X=" << point.x << " Y=" << point.y << " Z=" << point.z << std::endl;
 	}*/
 	//
 	float lastX = 0;
-	float xStreak = -1000;
+	float xStreak = -1000; 
 	int streak = 0;
-	bool edge = false;
+	bool edge = false; 
 	for (int i = 0; i < points.size() - 1; i++) {
 		asdk::Point3F point = points[i];
 		if (i != 0) {
@@ -287,10 +281,10 @@ int scan()
 				if (lastX < 20) {
 					if (lastX > (xStreak - 1) && lastX < (xStreak + 1)) {
 						xStreak = lastX;
-						streak++;
+						streak++; 
 					}
 					else {
-						xStreak = lastX;
+						xStreak = lastX; 
 						if (streak > 10) {
 							edge = true;
 						}
@@ -299,7 +293,7 @@ int scan()
 				}
 			}
 		}
-		else {
+		else{
 			lastX = point.x;
 		}
 	}
@@ -307,59 +301,37 @@ int scan()
 		edge = true;
 	}
 	if (edge) {
-		ROS_INFO("Edge  detected");
+		std::wcout << L"Edge  detected" << std::endl;
 	}
 	else {
-		ROS_INFO("No Edge  detected");
+		std::wcout << L"No Edge  detected" << std::endl;
 	}
 	//
-	ROS_INFO("Preparing workset for further processing...");
+	std::wcout << L"Preparing workset for further processing..." << std::endl;
 	std::swap(workset.in, workset.out);
 	workset.out->clear();
-	ROS_INFO("OK");
+	std::wcout << L"OK" << std::endl;
 	// saving the resulting texture to OBJ format
-	/*
+
 	asdk::ICompositeContainer* meshContainer = workset.in->getCompositeContainer();
 	if (meshContainer && meshContainer->getSize() > 0)
 	{
 		asdk::ICompositeMesh* resultMesh = meshContainer->getElement(0);
-		ROS_INFO("Saving the resulting textured mesh to an OBJ file...");
+		std::wcout << L"Saving the resulting textured mesh to an OBJ file..." << std::endl;
 		const wchar_t* filename = OUTPUT_DIR L"\\textured-mesh.obj";
 		asdk::ErrorCode errorCode = asdk::io::saveObjCompositeToFile(filename, resultMesh);
 		if (errorCode != asdk::ErrorCode_OK)
 		{
-			ROS_INFO("Cannot open file '" << filename << "'");
-			ROS_INFO("skipped");
+			std::wcout << L"Cannot open file '" << filename << "'" << std::endl;
+			std::wcout << L"skipped" << std::endl;
 		}
 		else
 		{
-			ROS_INFO("OK");
+			std::wcout << L"OK" << std::endl;
 		}
 	}
-	*/
+
 	scanner = NULL;
-	ROS_INFO("Scanner released");
+	std::wcout << L"Scanner released" << std::endl;
 	return 0;
-}
-
-void finish(int sig) {
-	ROS_INFO("goodbye!");
-	std_msgs::Int8 msg;
-	msg.data = sig;
-	ROS_INFO("%d", msg.data);
-	ros::shutdown();
-}
-int main(int argc, char* argv[])
-{
-	// This must be called before anything else ROS-related
-	ros::init(argc, argv, "artec");
-	scan();
-	// Create a ROS node handle
-	ros::NodeHandle nh;
-
-	ROS_INFO("Hello, World!");
-	signal(SIGINT,finish);
-
-	// Don't exit the program.
-	ros::spin();
 }
