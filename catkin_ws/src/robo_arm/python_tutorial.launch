@@ -1,0 +1,10 @@
+<launch>
+    <include file="$(find ur_robot_driver)/launch/ur3_bringup.launch">
+        <arg name="robot_ip" value="192.168.12.200"/>
+        <arg name="kinematics_config" value="${HOME}/ur3_calibration.yaml"/>
+    </include>
+
+    <include file="$(find ur3_moveit_config)/launch/ur3_moveit_planning_execution.launch"/>
+
+    <node pkg="robo_arm" name="tutorial.py" type="moveit_python_node"/>
+</launch>

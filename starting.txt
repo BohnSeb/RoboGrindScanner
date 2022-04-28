@@ -4,7 +4,7 @@ roslaunch ur5_moveit_config ur5_moveit_planning_execution.launch sim:=true
 roslaunch ur5_moveit_config moveit_rviz.launch config:=true
 
 --- Reallife ---
-roslaunch ur_calibration calibration_correction.launch robot_ip:=<robot_ip> target_filename:="${HOME}/ur5_calibration.yaml"
-roslaunch ur_robot_driver ur5_bringup.launch robot_ip:=<robot_ip> kinematics_config:=${HOME}/ur5_calibration.yaml
-roslaunch ur5_moveit_config ur5_moveit_planning_execution.launch
-roslaunch ur5_moveit_config moveit_rviz.launch config:=true
+roslaunch ur_calibration calibration_correction.launch robot_ip:=192.168.12.200 target_filename:="${HOME}/ur3_calibration.yaml"
+roslaunch ur_robot_driver ur3_bringup.launch robot_ip:=192.168.12.200 kinematics_config:=${HOME}/ur3_calibration.yaml
+roslaunch ur3_moveit_config ur3_moveit_planning_execution.launch
+roslaunch ur3_moveit_config moveit_rviz.launch config:=true
