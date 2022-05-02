@@ -3,7 +3,6 @@ import rospy
 import moveit_commander
 import moveit_msgs.msg
 import math
-from robo_arm import waypointlist
 
 class UR():
     def __init__(self):
