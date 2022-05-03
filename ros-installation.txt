@@ -4,6 +4,7 @@ curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo ap
 sudo apt update
 sudo apt install ros-noetic-desktop-full
 sudo apt-get install python3-catkin-tools
+sudo apt install ros-melodic-timed-roslaunch
 
 --install packages
 sudo apt install ros-noetic-PACKAGE

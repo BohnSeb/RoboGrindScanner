@@ -66,7 +66,7 @@ def create3dBallhausPose(starting_pose, distance, horizontal_angle, vertical_ang
     pose.orientation = rotation.asMoveitQuaternion()
     return pose
 
-def create3dBallhaus(starting_pose, distance, angle, vertical_rotation_offset):
+def create3dBallhaus(starting_pose, distance, angle, vertical_rotation_offset = 0):
     wp = WaypointList()
     pose = create3dBallhausPose(starting_pose, distance, angle, angle, vertical_rotation_offset)
     wp.addWaypoint(pose)
@@ -83,13 +83,13 @@ def create3dBallhaus(starting_pose, distance, angle, vertical_rotation_offset):
 
 
 def main():
-    distance = 0.1 #in meter
+    distance = 0.6 #in meter
     degrees = 15 # in degrees (goes up and down)
     ur = UR()
     startPos(ur)
-    ballhaus_startpos = createLineWithRotation(ur.getPose(), -0.18, 0, -0.1, 0, 90, 0)
+    ballhaus_startpos = createLineWithRotation(ur.getPose(), -0.08, 0, -0.1, 0, 0, 0)
     ur.travelPath(ballhaus_startpos)
-    bh = create3dBallhaus(ur.getPose(), distance, degrees, 90)
+    bh = create3dBallhaus(ur.getPose(), distance, degrees)
     ur.travelPath(bh)
     return
 

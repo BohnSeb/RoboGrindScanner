@@ -1,0 +1,18 @@
+<launch>
+    <arg name="rviz" default="false"/>
+    <include file="$(find ur_gazebo)/launch/ur3_bringup.launch"/>
+    <include file="$(find timed_roslaunch)/timed_roslaunch.launch">
+        <arg name="time" value="5" />
+        <arg name="pkg" value="ur3_moveit_config" />
+        <arg name="file" value="ur3_moveit_planning_execution.launch" />
+        <arg name="value" value="sim:=true" />
+    </include>
+    <group if="$(arg rviz)">
+        <include file="$(find timed_roslaunch)/timed_roslaunch.launch">
+            <arg name="time" value="10" />
+            <arg name="pkg" value="ur3_moveit_config" />
+            <arg name="file" value="moveit_rviz.launch" />
+            <arg name="value" value="config:=true" />
+        </include>
+    </group>
+</launch>
