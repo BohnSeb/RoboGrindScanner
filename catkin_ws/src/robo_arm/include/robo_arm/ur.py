@@ -6,9 +6,9 @@ import math
 import geometry_msgs.msg
 
 class UR():
-    def __init__(self):
+    def __init__(self, name, anonymous=False):
         moveit_commander.roscpp_initialize(sys.argv)
-        rospy.init_node("ur_python_interface", anonymous=True)
+        rospy.init_node(name, anonymous=anonymous)
         display_trajectory_publisher = rospy.Publisher(
             "/move_group/display_planned_path",
             moveit_msgs.msg.DisplayTrajectory,

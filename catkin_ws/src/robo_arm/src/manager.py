@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import String
+import geometry_msgs.msg
 
 def send(pub):
     rate = rospy.Rate(1)
@@ -21,13 +22,9 @@ def callback(msg):
 
 def main():
     rospy.init_node('manager', anonymous=False)
-    listen()
-    pub = rospy.Publisher('artec_capture_in', String, queue_size=10, latch=True)
-    try:
-        send(pub)
-    except rospy.ROSInterruptException:
-        print("Somwings wrongiwrong!")
-    rospy.spin()
+    pub = rospy.Publisher('ur_pose_in', geometry_msgs.msg.Pose, queue_size=10, latch=True)
+    rospy.sleep(2)
+    pub.publish(geometry_msgs.msg.Pose())
 
 
 if __name__ == "__main__":
