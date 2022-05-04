@@ -3,6 +3,7 @@ import rospy
 import moveit_commander
 import moveit_msgs.msg
 import math
+import geometry_msgs.msg
 
 class UR():
     def __init__(self):
@@ -96,3 +97,52 @@ class UR():
             0.0     #jump threshold
         )
         self.group.execute(plan, wait=True)
+
+    def grabObject(self, object):
+        grasping_group = "manipulator"
+        #touch_links = self.robot.get_link_names(group=grasping_group)
+        self.scene.attach_box(self.eef_link, object.name, touch_links="tool0")
+
+    def releaseObject(self, object):
+        self.scene.remove_attached_object(self.eef_link, name=object.name)
+
+class Box:
+    def __init__(self, name,  length, width, height, pose=geometry_msgs.msg.PoseStamped()):
+        self.name = name
+        self.length = length
+        self.width = width
+        self.height = height
+        self.pose = pose
+        self.pose.header.frame_id = ""
+        self.pose.pose.position.z = self.height / 2
+
+    def setHeaderFrameId(self, frame_id):
+        self.pose.header.frame_id = frame_id
+
+    def setPose(pose):
+        self.pose=pose
+    
+    def addToScene(self, scene):
+        scene.add_box(self.name, self.pose, size=(self.length,self.width,self.height))
+        self.ensureCollisionUpdates(scene, self.name)
+
+    def ensureCollisionUpdates(self, scene,box_name, timeout=4, box_is_attached=False, box_is_known=False):
+        #ensure collision updates
+        start = rospy.get_time()
+        seconds = rospy.get_time()
+        while (seconds - start < timeout) and not rospy.is_shutdown():
+            #test if box is in attached objects
+            attached_object = scene.get_attached_objects([box_name])
+            is_attached = len(attached_object.keys()) > 0
+            #test if box is in scene
+            is_known = box_name in scene.get_known_object_names()
+            #test if box is in expected state
+            if (box_is_attached == is_attached) and (box_is_known == is_known):
+                return True
+            rospy.sleep(0.1)
+            seconds = rospy.get_time()
+        return False
+
+    def removeFromScene(self, scene):
+        scene.remove_world_object(self.name)
+

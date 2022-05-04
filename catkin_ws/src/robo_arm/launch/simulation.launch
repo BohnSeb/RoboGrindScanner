@@ -12,7 +12,7 @@
             <arg name="time" value="10" />
             <arg name="pkg" value="ur3_moveit_config" />
             <arg name="file" value="moveit_rviz.launch" />
-            <arg name="value" value="config:=true" />
+            <arg name="value" value="config:=true rviz_config:=$(find robo_arm)/config/ur3.rviz" />
         </include>
     </group>
 </launch>
