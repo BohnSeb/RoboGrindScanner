@@ -4,6 +4,7 @@ import moveit_commander
 import moveit_msgs.msg
 import math
 import geometry_msgs.msg
+import copy
 
 class UR():
     def __init__(self, name, anonymous=False):
@@ -45,7 +46,7 @@ class UR():
         return self.group.get_current_joint_values()
 
     def getPose(self):
-        return self.group.get_current_pose().pose
+        return copy.deepcopy(self.group.get_current_pose().pose)
 
     def printCurrentJointValues(self):
         joints = self.getJointValues()
@@ -96,7 +97,7 @@ class UR():
             0.01, #eef_steps
             0.0     #jump threshold
         )
-        self.group.execute(plan, wait=True)
+        return self.group.execute(plan, wait=True)
 
     def grabObject(self, object):
         grasping_group = "manipulator"

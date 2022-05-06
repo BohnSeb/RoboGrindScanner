@@ -24,7 +24,7 @@ class Rotation():
         (x,y,z,w) = self.asQuaternion()
         return Quaternion(x,y,z,w)
 
-class WaypointList():
+class WaypointList:
     def __init__(self):
         self.waypoints = []
 
