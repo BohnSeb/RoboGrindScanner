@@ -21,6 +21,7 @@ catkin_package()
 ## Build ##
 ###########
 
+
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
@@ -30,10 +31,13 @@ include_directories(
 )
 
 
-add_executable(testscan src/artec.cpp)
+add_executable(scan src/artec.cpp)
+add_executable(distance src/getDistance.cpp)
+
+add_executable(testAblauf src/testAblauf.cpp)
 
 
-target_link_libraries(testscan
+target_link_libraries(scan
   ${catkin_LIBRARIES} 
   ${PROJECT_SOURCE_DIR}/lib/artec-sdk-algorithms.lib
   ${PROJECT_SOURCE_DIR}/lib/artec-sdk-base.lib
@@ -41,7 +45,26 @@ target_link_libraries(testscan
   ${PROJECT_SOURCE_DIR}/lib/artec-sdk-project.lib
   ${PROJECT_SOURCE_DIR}/lib/artec-sdk-scanning.lib
 )
-add_custom_command(TARGET testscan POST_BUILD
+
+target_link_libraries(distance
+  ${catkin_LIBRARIES} 
+  ${PROJECT_SOURCE_DIR}/lib/artec-sdk-algorithms.lib
+  ${PROJECT_SOURCE_DIR}/lib/artec-sdk-base.lib
+  ${PROJECT_SOURCE_DIR}/lib/artec-sdk-capturing.lib
+  ${PROJECT_SOURCE_DIR}/lib/artec-sdk-project.lib
+  ${PROJECT_SOURCE_DIR}/lib/artec-sdk-scanning.lib
+)
+
+target_link_libraries(testAblauf
+  ${catkin_LIBRARIES} 
+)
+
+add_custom_command(TARGET scan POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PROJECT_SOURCE_DIR}/dll"
-        $<TARGET_FILE_DIR:testscan>)
+        $<TARGET_FILE_DIR:scan>)
+
+add_custom_command(TARGET distance POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/dll"
+        $<TARGET_FILE_DIR:distance>)

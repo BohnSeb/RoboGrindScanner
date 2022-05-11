@@ -8,7 +8,15 @@
 *
 ********************************************************************/
 
-#include <string>
+
+
+
+#include <ros/ros.h>
+#include <signal.h>
+#include <std_msgs/Int8.h>
+#include "std_msgs/String.h"
+#include "std_msgs/Float32.h"
+
 #include <iostream>
 #include <iomanip>
 #include <boost/thread.hpp>
@@ -127,7 +135,7 @@ const int NumberOfFramesToCapture = 100;
 static bool s_Finished = false;
 
 
-int main(int argc, char** argv)
+float getDistance()
 {
 	TRef<asdk::IModel> inputContainer;
 	TRef<asdk::IModel> outputContainer;
@@ -190,8 +198,6 @@ int main(int argc, char** argv)
 	{
 		return -1;
 	}
-	TRef<asdk::IScan> scan;
-	asdk::createScan(&scan);
 	// Capture the next single frame image
 	TRef<asdk::IFrame> frame;
 	asdk::ErrorCode ec = scanner->capture(&frame, true);
@@ -229,109 +235,67 @@ int main(int argc, char** argv)
 		std::wcout << L"Capture error: reconstruction failed for frame " << std::setw(4) << (frameNumber + 1) << std::endl;
 		return -1;
 	}
-	/*
+	
 	float averageDistance = 0;
-	float closestPoint = 0;
-	float furthestPoint = 0;
+	int averageDistanceCount = 0;
 	asdk::TArrayPoint3F points = mesh->getPoints();
 	for (int i = 0; i < points.size() - 1; i++) {
 
 		asdk::Point3F point = points[i];
-		float distance = point.length();
-		point.x;
-		averageDistance += distance;
-		if (i == 0) {
-			closestPoint = distance;
-			furthestPoint = distance;
+		if (point.y >= -15 && point.y <= 15 && point.x >= -15 && point.x <= 15) {
+			//std::cout << " Y:" << point.y << " X:" << point.x << " Z:" << point.z << std::endl;
+			averageDistance += point.length();
+			averageDistanceCount++;
 		}
-		else {
-			if (distance < closestPoint) {
-				closestPoint = distance;
-			}
-			if (distance > furthestPoint) {
-				furthestPoint = distance;
-			}
-		}
+
 	}
-	if (points.size() != 0)
+	if (averageDistanceCount != 0)
 	{
-		averageDistance = averageDistance / points.size();
-	}
-	std::wcout << L"Measured average distance: " << averageDistance << std::endl;
-	std::wcout << L"Measured closest distance: " << closestPoint << std::endl;
-	std::wcout << L"Measured furthest distance: " << furthestPoint << std::endl;
-	*/
-	asdk::TArrayPoint3F points = mesh->getPoints();
-	/*for (int i = 0; i < points.size() - 1; i++) {
-		asdk::Point3F point = points[i];
-		std::wcout << L"Point" << i << ": X=" << point.x << " Y=" << point.y << " Z=" << point.z << std::endl;
-	}*/
-	//
-	float lastX = 0;
-	float xStreak = -1000; 
-	int streak = 0;
-	bool edge = false; 
-	for (int i = 0; i < points.size() - 1; i++) {
-		asdk::Point3F point = points[i];
-		if (i != 0) {
-			if (point.x > lastX) {
-				lastX = point.x;
-			}
-			else {
-				if (lastX < 20) {
-					if (lastX > (xStreak - 1) && lastX < (xStreak + 1)) {
-						xStreak = lastX;
-						streak++; 
-					}
-					else {
-						xStreak = lastX; 
-						if (streak > 10) {
-							edge = true;
-						}
-						streak = 0;
-					}
-				}
-			}
-		}
-		else{
-			lastX = point.x;
-		}
-	}
-	if (!edge && streak > 10) {
-		edge = true;
-	}
-	if (edge) {
-		std::wcout << L"Edge  detected" << std::endl;
+		averageDistance = averageDistance / averageDistanceCount;
+		std::cout << "Average Distance Mesassured: " << averageDistance << std::endl;
 	}
 	else {
-		std::wcout << L"No Edge  detected" << std::endl;
+		std::cout << "No points meassured" << std::endl;
 	}
-	//
-	std::wcout << L"Preparing workset for further processing..." << std::endl;
-	std::swap(workset.in, workset.out);
-	workset.out->clear();
-	std::wcout << L"OK" << std::endl;
-	// saving the resulting texture to OBJ format
-
-	asdk::ICompositeContainer* meshContainer = workset.in->getCompositeContainer();
-	if (meshContainer && meshContainer->getSize() > 0)
-	{
-		asdk::ICompositeMesh* resultMesh = meshContainer->getElement(0);
-		std::wcout << L"Saving the resulting textured mesh to an OBJ file..." << std::endl;
-		const wchar_t* filename = OUTPUT_DIR L"\\textured-mesh.obj";
-		asdk::ErrorCode errorCode = asdk::io::saveObjCompositeToFile(filename, resultMesh);
-		if (errorCode != asdk::ErrorCode_OK)
-		{
-			std::wcout << L"Cannot open file '" << filename << "'" << std::endl;
-			std::wcout << L"skipped" << std::endl;
-		}
-		else
-		{
-			std::wcout << L"OK" << std::endl;
-		}
-	}
-
 	scanner = NULL;
 	std::wcout << L"Scanner released" << std::endl;
-	return 0;
+	return averageDistance;
+}
+
+void artecCallbackIn(const std_msgs::String::ConstPtr& msg)
+{
+	std::wcout << L"Start received" << std::endl;
+	std_msgs::Float32 distance;
+	distance.data = getDistance();
+	ros::NodeHandle nh;
+	ros::Publisher distancePup = nh.advertise<std_msgs::Float32>("artec_distance/distance", 100);
+	ros::Duration(1).sleep();
+	distancePup.publish(distance);
+	ros::Duration(1).sleep();
+	ros::spinOnce();
+}
+
+
+int main(int argc, char* argv[])
+{
+	std::wcout << L"started Note" << std::endl;
+	// This must be called before anything else ROS-related
+	ros::init(argc, argv, "artec_Distance");
+	// Create a ROS node handle
+	ros::NodeHandle nh;
+
+	ROS_INFO("Note set up");
+	/*if (argc < 2)
+	{
+		printUsage();
+		return -1;
+	} else{
+	 dirPath = argv[1];
+	}*/
+
+	ros::Subscriber startSub = nh.subscribe("artec_distance/start", 10, artecCallbackIn);
+	
+
+	// Don't exit the program.
+	ros::spin();
 }
