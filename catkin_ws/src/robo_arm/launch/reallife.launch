@@ -1,15 +1,18 @@
 <launch>
     <arg name="rviz" default="false"/>
-    <include file="$(find ur_gazebo)/launch/ur3_bringup.launch"/>
+    <include file="$(find ur_robot_driver)/launch/ur3_bringup.launch">
+        <arg name="robot_ip" value="192.168.11.200"/>
+        <arg name="kinematics_config" value="$(env HOME)/ur3_calibration.yaml"/>
+    </include>
     <include file="$(find timed_roslaunch)/timed_roslaunch.launch">
-        <arg name="time" value="5" />
+        <arg name="time" value="20" />
         <arg name="pkg" value="ur3_moveit_config" />
         <arg name="file" value="ur3_moveit_planning_execution.launch" />
-        <arg name="value" value="sim:=true limited:=true" />
+        <arg name="value" value="limited:=true" />
     </include>
     <group if="$(arg rviz)">
         <include file="$(find timed_roslaunch)/timed_roslaunch.launch">
-            <arg name="time" value="10" />
+            <arg name="time" value="30" />
             <arg name="pkg" value="ur3_moveit_config" />
             <arg name="file" value="moveit_rviz.launch" />
             <arg name="value" value="config:=true rviz_config:=$(find robo_arm)/config/ur3.rviz" />

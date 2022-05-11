@@ -52,9 +52,12 @@ class UrController:
         
 
     def moveToStartingPosition(self, msg=Bool(False)):
-        self.ur.setJointsWithAngle(0, -81, 102, -111, 90, -90)
+        #self.ur.setJointsWithAngle(0, -81, 102, -20, 90, -90)
         self.ur.setJointsWithAngle(-50, -143, 146, -90, 90, -40)
-        rotation = Rotation(0, 0, 0)
+        #self.ur.setJointsWithAngle(-35, -42, 134, -95, 56, -90)
+        #self.ur.setJointsWithAngle(-33, -68, 130, -62, 57, -90)
+        #self.ur.setJointsWithAngle(-51, -120, 112, 9, 39, -90)
+        rotation = Rotation(0, 90, 0)
         pose = self.ur.getPose()
         pose.orientation = rotation.asMoveitQuaternion()
         self.ur.planAndMove(pose)
@@ -79,7 +82,7 @@ class UrController:
         tool.removeFromScene(self.ur.scene)
 
     def receivePoseMessage(self, pose):
-        #rospy.loginfo("Moving to: {}".format(pose))
+        rospy.loginfo("Moving to: {}".format(pose))
         wp = WaypointList()
         wp.addWaypoint(pose)
         succesfull = self.ur.travelPath(wp)
@@ -96,13 +99,57 @@ class UrController:
             self.sendCurrentPose()
             rate.sleep()
 
+def addArtec(controller):
+        length = 0.158
+        width = 0.063
+        height = 0.262
+        tool = Box("Artec", length, width, height)
+        r = Rotation(0,0,0)
+        tool.setRotation(r)
+        tool.pose.pose.position.x -= length/2 - 0.03
+        tool.pose.pose.position.z += 0.1
+        tool.setHeaderFrameId("tool0")
+        tool.addToScene(controller.ur.scene)
+        controller.ur.grabObject(tool)
+        return tool
+
+def addFloor(controller):
+    length = 10
+    width = 10
+    height = 0.1
+    floor = Box("Floor", length, width, height)
+    floor.setHeaderFrameId("base")
+    floor.setRotation(Rotation(0, 0, 0))
+    floor.pose.pose.position.z -= height + 0.095
+    floor.addToScene(controller.ur.scene)
+    return floor
+
+def addPodest(controller):
+    length = 0.16
+    width = 0.16
+    height = 0.2
+    podest = Box("Podest", length, width, height)
+    podest.setHeaderFrameId("base")
+    podest.setRotation(Rotation(0, 0, 0))
+    podest.pose.pose.position.z -= height
+    podest.pose.pose.position.x += length + 0.02
+    podest.addToScene(controller.ur.scene)
+    return podest
+
+
 def main():
     controller = UrController()
-    tool = controller.addTool("Artec", 0.158,0.063,0.262)
+    #tool = controller.addTool("Artec", 0.158,0.063,0.262)
+    #tool = controller.addArtec()
+    tool = addArtec(controller)
+    floor = addFloor(controller)
+    podest = addPodest(controller)
     try:
         controller.loopCurrentPose(1)
     except rospy.ROSInterruptException:
         controller.removeTool(tool)
+        controller.removeBox(floor.name)
+        controller.removeBox(podest)
 
 if __name__ == "__main__":
     main()

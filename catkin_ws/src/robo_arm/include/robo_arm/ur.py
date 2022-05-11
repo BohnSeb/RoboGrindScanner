@@ -7,7 +7,7 @@ import geometry_msgs.msg
 import copy
 
 class UR():
-    def __init__(self, name, anonymous=False):
+    def __init__(self, name, anonymous=False, disable_signals=False):
         moveit_commander.roscpp_initialize(sys.argv)
         rospy.init_node(name, anonymous=anonymous)
         display_trajectory_publisher = rospy.Publisher(
@@ -120,8 +120,11 @@ class Box:
     def setHeaderFrameId(self, frame_id):
         self.pose.header.frame_id = frame_id
 
-    def setPose(pose):
-        self.pose=pose
+    def setPose(self, pose):
+        self.pose.pose=pose
+
+    def setRotation(self, rotation):
+        self.pose.pose.orientation = rotation.asMoveitQuaternion()
     
     def addToScene(self, scene):
         scene.add_box(self.name, self.pose, size=(self.length,self.width,self.height))

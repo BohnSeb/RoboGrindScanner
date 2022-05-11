@@ -53,6 +53,18 @@ def create3dBallhaus(starting_pose, distance, angle, vertical_rotation_offset = 
     wp.addWaypoint(pose)
     return wp
 
+def create3dBallhausRange(starting_pose, distance, horizontal_angle, vertical_angle_min, vertical_angle_max, steps, x_offset=0, y_offset=0, z_offset=0):
+    wp = WaypointList()
+    for horizontal in range(steps, horizontal_angle, steps):
+        wp.addWaypoint(create3dBallhausPose(starting_pose, distance, horizontal, vertical_angle_min, x_offset=x_offset, y_offset=y_offset, z_offset=z_offset))
+    for horizonal in range(-1 * steps, -1 * horizontal_angle, steps * -1):
+        wp.addWaypoint(create3dBallhausPose(starting_pose, distance, horizontal, vertical_angle_min, x_offset=x_offset, y_offset=y_offset, z_offset=z_offset))
+    for horizonal in range(-1 * steps, -1 * horizontal_angle, steps * -1):
+        wp.addWaypoint(create3dBallhausPose(starting_pose, distance, horizontal, vertical_angle_max, x_offset=x_offset, y_offset=y_offset, z_offset=z_offset))
+    for horizontal in range(steps, horizontal_angle, steps):
+        wp.addWaypoint(create3dBallhausPose(starting_pose, distance, horizontal, vertical_angle_max, x_offset=x_offset, y_offset=y_offset, z_offset=z_offset))
+    return wp
+
 def main():
     distance = 0.6 #in meter
     degrees = 10 # in degrees (goes up and down)
